@@ -13,6 +13,12 @@ echo "📦 Cloning repositories..."
 [ ! -d "backend" ] && git clone https://github.com/Auto-Edge/auto-edge-server backend
 [ ! -d "ios-sdk" ] && git clone https://github.com/Auto-Edge/ios-sdk ios-sdk || echo "⚠️ iOS SDK clone skipped or failed (optional)"
 
+cd frontend
+sudo chown -R $(whoami) ~/.npm
+npm cache clean --force
+rm -rf frontend/node_modules frontend/package-lock.json
+cd ..
+
 # 3. Handle "Double Git" Requirement
 # Removes the .git history of this stack wrapper, so only the sub-projects are git repos
 if [ -d ".git" ]; then
