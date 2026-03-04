@@ -17,6 +17,7 @@ echo "📦 Cloning repositories..."
 # We create this folder now so Docker doesn't try to create it as root later and crash
 echo "🔧 Pre-creating mount points to prevent Docker permission errors..."
 cd frontend && npm install
+cd ..
 
 # 3. Handle "Double Git" Requirement
 # Removes the .git history of this stack wrapper, so only the sub-projects are git repos
