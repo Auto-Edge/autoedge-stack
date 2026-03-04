@@ -16,9 +16,8 @@ echo "📦 Cloning repositories..."
 cd frontend
 sudo chown -R $(whoami) ~/.npm
 npm cache clean --force
-rm -rf frontend/node_modules frontend/package-lock.json
+rm -rf node_modules package-lock.json # <-- Removed the "frontend/" prefix
 cd ..
-
 # 3. Handle "Double Git" Requirement
 # Removes the .git history of this stack wrapper, so only the sub-projects are git repos
 if [ -d ".git" ]; then
