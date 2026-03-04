@@ -13,11 +13,6 @@ echo "📦 Cloning repositories..."
 [ ! -d "backend" ] && git clone https://github.com/Auto-Edge/auto-edge-server backend
 [ ! -d "ios-sdk" ] && git clone https://github.com/Auto-Edge/ios-sdk ios-sdk || echo "⚠️ iOS SDK clone skipped or failed (optional)"
 
-# 2. Fix Docker Mount Permissions (Long-term solution)
-# We create this folder now so Docker doesn't try to create it as root later and crash
-echo "🔧 Pre-creating mount points to prevent Docker permission errors..."
-mkdir -p frontend/node_modules
-
 # 3. Handle "Double Git" Requirement
 # Removes the .git history of this stack wrapper, so only the sub-projects are git repos
 if [ -d ".git" ]; then
