@@ -16,7 +16,7 @@ echo "📦 Cloning repositories..."
 # 2. Fix Docker Mount Permissions (Long-term solution)
 # We create this folder now so Docker doesn't try to create it as root later and crash
 echo "🔧 Pre-creating mount points to prevent Docker permission errors..."
-mkdir -p frontend/node_modules
+cd frontend && npm install
 
 # 3. Handle "Double Git" Requirement
 # Removes the .git history of this stack wrapper, so only the sub-projects are git repos
