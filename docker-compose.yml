@@ -1,0 +1,82 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: autoedge-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - autoedge-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: autoedge-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - SHARED_DATA_PATH=/app/shared_data
+      - PYTHONPATH=/app
+    volumes:
+      - shared_data:/app/shared_data
+      - ./backend:/app
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - autoedge-network
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: autoedge-worker
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - SHARED_DATA_PATH=/app/shared_data
+      - PYTHONPATH=/app
+    volumes:
+      - shared_data:/app/shared_data
+      - ./backend:/app
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - autoedge-network
+    command: celery -A worker.celery_app worker --loglevel=info --concurrency=10
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: autoedge-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - autoedge-network
+
+volumes:
+  shared_data:
+    driver: local
+
+networks:
+  autoedge-network:
+    driver: bridge
